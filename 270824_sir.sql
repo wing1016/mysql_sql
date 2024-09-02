@@ -1,4 +1,4 @@
- -- comment
+-- comment
 -- database -> table (row x column)
 create database db_bc2405p;
 
@@ -134,11 +134,11 @@ select o.customer_id, sum(o.total_amount), avg(o.total_amount), min(o.total_amou
 from orders o group by o.customer_id; -- OK
 
 select o.customer_id, sum(o.total_amount), o.id from orders o group by o.customer_id; -- NOT OK, why?
-1 99.9 3
-2 12006 (1 or 2?)
+-- 1 99.9 3
+-- 2 12006 (1 or 2?)
 
 -- group by "unique key" -> meaningless
-select o.id, sum(o.total_amount) from orders o group by o.id
+select o.id, sum(o.total_amount) from orders o group by o.id;
 
 -- GROUP BY + HAVING
 insert into orders values (4, 10000.9, 3);
@@ -185,10 +185,10 @@ SELECT EXTRACT(YEAR FROM DATE_FORMAT('2023-08-31', '%Y-%m-%d')) from dual;
 SELECT EXTRACT(MONTH FROM DATE_FORMAT('2023-08-31', '%Y-%m-%d')) from dual;
 SELECT EXTRACT(DAY FROM DATE_FORMAT('2023/08/31', '%Y/%m/%d')) from dual;
 
-Result:
-2024 2
-2023 2
-2022 1
+-- Result:
+-- 2024 2
+-- 2023 2
+-- 2022 1
 
 select EXTRACT(YEAR from tran_date) as YEAR, count(1) as NUMBER_OF_ORDERS
 from orders
@@ -248,8 +248,58 @@ select * from customers;
 select * from orders;
 
 -- "o.customer_id = c.id" -> check if the customer exists in orders
-select *
+-- Approach 1 (you cannot select columns from order table)
+select c.*
 from customers c
 where exists (select 1 from orders o where o.customer_id = c.id);
 
+-- JOIN tables
+-- 4 customers x 6 orders -> 24 rows
+select *
+from customers c inner join orders o; -- on
 
+-- INNER JOIN is similar to EXISTS
+-- Approach 2
+select c.id, c.name, o.total_amount, o.tran_date
+from customers c inner join orders o on o.customer_id = c.id;
+
+select * from orders;
+
+
+select *
+from customers c
+where not exists (select 1 from orders o where o.customer_id = c.id);
+
+select * from orders;
+insert into orders values (6, 9999, 3, DATE_FORMAT('2024-08-04', '%Y-%m-%d'));
+
+-- distinct one column
+select distinct concat_ws('-', extract(YEAR from tran_date), extract(MONTH from tran_date)) from orders;
+-- distinct two columns
+select distinct concat_ws('-', extract(YEAR from tran_date), extract(MONTH from tran_date)), total_amount from orders;
+
+select o.*, (select max(total_amount) from orders), 20000.00, 1
+from orders o;
+
+-- Subquery (slow performance)
+-- First SQL to execute: select id from customers where name like '%LAU'
+-- Secondly, DBMS executes "select * from orders where customer_id in ...."
+select *
+from orders
+where customer_id in (select id from customers where name like '%LAU');
+use db_bc2405p;
+select * from customers;
+
+-- DDL
+ALTER TABLE customers ADD CONSTRAINT pk_customer_id primary key (id);
+
+insert into customers values ( 5, 'Mary Chan', 'mary@gmail.com' );
+
+-- ADD FK
+ALTER table orders Add constraint fk_customer_id FOREIGN KEY (customer_id) REFERENCES customers(id);
+
+insert into orders values ( 8, 9000, 5, date_format('2024-08-04','%y-%m-%d') );  
+alter table customers add constraint unique_email unique (email);		
+
+-- NOT NULL
+ALTER TABLE customers modify name varchar(50) not null;	

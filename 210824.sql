@@ -33,3 +33,5 @@ select * from students;
 
 insert into students (id, name, weight, height) values (4.5, 'Susan', 45.5, 130);
 
+
+
