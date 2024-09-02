@@ -11,10 +11,9 @@ create table jobs (
 create table regions (
 	region_id int PRIMARY KEY,
 	region_name varchar(25)
--- 	
+
 );
 
--- foreign key (customer_id) references table()
 
 create table countries (
 	country_id char(2) PRIMARY KEY,
@@ -70,7 +69,7 @@ create table employees (
     foreign key (employee_id) references job_history(employee_id),
     foreign key (job_id) references jobs(job_id)    
 );
-select first_name, last_name, job_id, department_id from employees;
+
 -- create table jobs_grades (
 -- 	grade_level varchar(2) PRIMARY KEY,
 -- 	lowest_sal int,
