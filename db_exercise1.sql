@@ -42,16 +42,7 @@ create table departments (
 	foreign key (location_id) references locations(location_id)
 );
 
-create table job_history (
-	employee_id int,
-	start_date date,
-	end_date date,
-	job_id varchar(10),
-	department_id int,
-	foreign key (department_id) references departments(department_id),
-    foreign key (job_id) references jobs(job_id),
-	PRIMARY KEY (employee_id, start_date)
-);
+
 
 create table employees (
 	employee_id int PRIMARY KEY,
@@ -65,9 +56,21 @@ create table employees (
 	commission_pct int,
 	manager_id int,
 	department_id int,
-    foreign key (department_id) references departments(department_id),
-    foreign key (employee_id) references job_history(employee_id),
-    foreign key (job_id) references jobs(job_id)    
+    foreign key (department_id) references departments(department_id),  
+    foreign key (job_id) references jobs(job_id) 
+  -- foreign key (employee_id) references job_history(employee_id)
+);
+
+create table job_history (
+	employee_id int,
+	start_date date,
+	end_date date,
+	job_id varchar(10),
+	department_id int,
+	foreign key (department_id) references departments(department_id),
+    foreign key (job_id) references jobs(job_id),
+    foreign key (employee_id) references employees(employee_id),
+	PRIMARY KEY (employee_id, start_date)
 );
 
 -- create table jobs_grades (
@@ -105,17 +108,23 @@ insert into departments values (20, 'Marketing', 202, 1200);
 insert into departments values (30, 'Purchasing', 202, 1400);
 insert into departments values (40, 'Account', 203, 1500);
 
+
+insert into employees values (100, 'Steven','King','SKING','515-1234567','1987-06-17','ST_CLERK', 24000, 0.00, 109, 10);
+insert into employees values (101, 'Neena','Kochhar','NKOCHHAR','515-1234568','1987-06-18','MK_REP', 17000, 0.00, 103, 20);
+insert into employees values (102, 'Lex','De Haan','LDEHAAN','515-1234569','1987-06-19','IT_PROG', 17000, 0.00, 108, 30);
+insert into employees values (103, 'Alexander','Hunold','AHUNOLD','590-4234567','1987-06-20','MK_REP', 9000, 0.00, 105, 20);
+insert into employees values (105, 'Betty','Chan','BECHAN','490-4234888','1970-06-20','MK_REP', 19000, 0.00, null, null);
+insert into employees values (200, 'Christ','Lee','CHLEE','870-4232323','1987-01-10','MK_REP', 17000, 0.00, null, 30);
+insert into employees values (202, 'Victor','Lau','VILAU','378-0674351','1995-02-23','IT_PROG', 13000, 0.00, null, 30);
+
+
 insert into job_history values (102, '1993-01-13','1998-07-24','IT_PROG', 20);
 insert into job_history values (101, '1989-09-21','1993-10-27','MK_REP', 10);
 insert into job_history values (101, '1993-10-28','1997-03-15','MK_REP', 30);
 insert into job_history values (100, '1996-02-17','1999-12-19','ST_CLERK', 30);
 insert into job_history values (103, '1998-03-24','1999-12-31','MK_REP', 20);
 
-insert into employees values (100, 'Steven','King','SKING','515-1234567','1987-06-17','ST_CLERK', 24000, 0.00, 109, 10);
-insert into employees values (101, 'Neena','Kochhar','NKOCHHAR','515-1234568','1987-06-18','MK_REP', 17000, 0.00, 103, 20);
-insert into employees values (102, 'Lex','De Haan','LDEHAAN','515-1234569','1987-06-19','IT_PROG', 17000, 0.00, 108, 30);
-insert into employees values (103, 'Alexander','Hunold','AHUNOLD','590-4234567','1987-06-20','MK_REP', 9000, 0.00, 105, 20);
-
+-- 03Sep24
 -- 3
 select location_id, street_address, city, state_province, country_id from locations;
 -- 4
@@ -128,3 +137,11 @@ select d.department_name, ROUND(AVG(e.salary), 2) as 'avg salary' from employees
 d.department_id group by e.department_id;
 
 
+-- 04Sep24
+-- 6
+select e1.employee_id, e1.last_name, e1.manager_id, e2.last_name from employees e1 left join employees e2 on e1.manager_id = e2.employee_id;
+-- 10
+select d.department_name, concat(e.first_name, ' ', e.last_name) as 'manager name' , l.city, c.country_name from departments d 
+left join employees e on d.manager_id = e.employee_id
+left join locations l on d.location_id = l.location_id
+left join countries c on l.country_id = c.country_id;
