@@ -303,3 +303,18 @@ alter table customers add constraint unique_email unique (email);
 
 -- NOT NULL
 ALTER TABLE customers modify name varchar(50) not null;	
+
+use db_bc2405p;
+show tables;
+
+create view orders_202408
+as
+select * 
+from orders 
+where tran_date between DATE_FORMAT('2020-08-01','%Y-%m-%d') and DATE_FORMAT('2025-10-01','%Y-%m-%d');
+
+DROP VIEW orders_202408;
+
+SELECT * FROM orders_202408;
+
+select * from orders;
